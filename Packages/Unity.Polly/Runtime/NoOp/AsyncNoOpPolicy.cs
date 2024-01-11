@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.NoOp
 {
@@ -16,7 +16,7 @@ namespace Polly.NoOp
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>( Func<Context, CancellationToken,Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>( Func<Context, CancellationToken,UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => NoOpEngine.ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext);
     }
@@ -32,7 +32,7 @@ namespace Polly.NoOp
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => NoOpEngine.ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext);
     }
