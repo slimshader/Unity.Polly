@@ -1,0 +1,13 @@
+{
+  "name": "pl.bravasoft.unity.polly",
+  "version": "1.0.0",
+  "displayName": "Unity Polly",
+  "description": "Port of Polly library for Unity based on UniTask",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "licensesUrl": "https://example.com/licensing.html",
+  "keywords": [],
+  "author": {
+    "name": "Bravasoft"
+  }
+}
