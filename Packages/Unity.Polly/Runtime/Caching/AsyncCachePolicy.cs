@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Caching
 {
@@ -42,8 +42,8 @@ namespace Polly.Caching
         }
 
         /// <inheritdoc/>
-        protected override Task ImplementationAsync(
-            Func<Context, CancellationToken, Task> action,
+        protected override UniTask ImplementationAsync(
+            Func<Context, CancellationToken, UniTask> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext)
@@ -54,7 +54,7 @@ namespace Polly.Caching
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             return AsyncCacheEngine.ImplementationAsync<TResult>(
@@ -112,7 +112,7 @@ namespace Polly.Caching
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             return AsyncCacheEngine.ImplementationAsync<TResult>(

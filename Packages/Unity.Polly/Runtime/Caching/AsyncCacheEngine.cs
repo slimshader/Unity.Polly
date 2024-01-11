@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Caching
 {
     internal static class AsyncCacheEngine
     {
-        internal static async Task<TResult> ImplementationAsync<TResult>(
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
             IAsyncCacheProvider<TResult> cacheProvider,
             ITtlStrategy<TResult> ttlStrategy,
             Func<Context, string> cacheKeyStrategy,
-            Func<Context, CancellationToken, Task<TResult>> action,
+            Func<Context, CancellationToken, UniTask<TResult>> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -25,14 +25,14 @@ namespace Polly.Caching
             string cacheKey = cacheKeyStrategy(context);
             if (cacheKey == null)
             {
-                return await action(context, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                return await action(context, cancellationToken);
             }
 
             bool cacheHit;
             TResult valueFromCache;
             try
             {
-                (cacheHit, valueFromCache) = await cacheProvider.TryGetAsync(cacheKey, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext);
+                (cacheHit, valueFromCache) = await cacheProvider.TryGetAsync(cacheKey, cancellationToken, continueOnCapturedContext);
             }
             catch (Exception ex)
             {
@@ -50,14 +50,14 @@ namespace Polly.Caching
                 onCacheMiss(context, cacheKey);
             }
 
-            TResult result = await action(context, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+            TResult result = await action(context, cancellationToken);
 
             Ttl ttl = ttlStrategy.GetTtl(context, result);
             if (ttl.Timespan > TimeSpan.Zero)
             {
                 try
                 {
-                    await cacheProvider.PutAsync(cacheKey, result, ttl, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext);
+                    await cacheProvider.PutAsync(cacheKey, result, ttl, cancellationToken, continueOnCapturedContext);
                     onCachePut(context, cacheKey);
                 }
                 catch (Exception ex)
