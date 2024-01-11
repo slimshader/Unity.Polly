@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly
 {
@@ -15,7 +15,7 @@ namespace Polly
         /// </summary>
         /// <param name="action">The action to perform.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Task> action)
+        public UniTask ExecuteAsync(Func<UniTask> action)
             => ExecuteAsync((_, _) => action(), new Context(), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <param name="contextData">Arbitrary data that is passed to the exception policy.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Context, Task> action, IDictionary<string, object> contextData)
+        public UniTask ExecuteAsync(Func<Context, UniTask> action, IDictionary<string, object> contextData)
             => ExecuteAsync((ctx, _) => action(ctx), new Context(contextData), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <param name="context">Context data that is passed to the exception policy.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Context, Task> action, Context context)
+        public UniTask ExecuteAsync(Func<Context, UniTask> action, Context context)
             => ExecuteAsync((ctx, _) => action(ctx), context, DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken)
+        public UniTask ExecuteAsync(Func<CancellationToken, UniTask> action, CancellationToken cancellationToken)
             => ExecuteAsync((_, ct) => action(ct), new Context(), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Polly
         /// <param name="contextData">Arbitrary data that is passed to the exception policy.</param>
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Context, CancellationToken, Task> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
+        public UniTask ExecuteAsync(Func<Context, CancellationToken, UniTask> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
             => ExecuteAsync(action, new Context(contextData), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Polly
         /// <param name="context">Context data that is passed to the exception policy.</param>
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Context, CancellationToken, Task> action, Context context, CancellationToken cancellationToken)
+        public UniTask ExecuteAsync(Func<Context, CancellationToken, UniTask> action, Context context, CancellationToken cancellationToken)
             => ExecuteAsync(action, context, cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask ExecuteAsync(Func<CancellationToken, UniTask> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAsync((_, ct) => action(ct), new Context(), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace Polly
         /// <param name="continueOnCapturedContext">Whether to continue on a captured synchronization context.</param>
         /// <exception cref="ArgumentNullException">contextData</exception>
         [DebuggerStepThrough]
-        public Task ExecuteAsync(Func<Context, CancellationToken, Task> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask ExecuteAsync(Func<Context, CancellationToken, UniTask> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAsync(action, new Context(contextData), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public async Task ExecuteAsync(Func<Context, CancellationToken, Task> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public async UniTask ExecuteAsync(Func<Context, CancellationToken, UniTask> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -105,7 +105,7 @@ namespace Polly
 
             try
             {
-                await ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext);
+                await ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext);
             }
             finally
             {
@@ -122,7 +122,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> action)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<UniTask<TResult>> action)
             => ExecuteAsync((_, _) => action(), new Context(), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Polly
         /// <param name="contextData">Arbitrary data that is passed to the exception policy.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Context, Task<TResult>> action, IDictionary<string, object> contextData)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<Context, UniTask<TResult>> action, IDictionary<string, object> contextData)
             => ExecuteAsync((ctx, _) => action(ctx), new Context(contextData), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Polly
         /// <param name="context">Context data that is passed to the exception policy.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Context, Task<TResult>> action, Context context)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<Context, UniTask<TResult>> action, Context context)
             => ExecuteAsync((ctx, _) => action(ctx), context, DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy is in use, also cancels any further retries.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> action, CancellationToken cancellationToken)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<CancellationToken, UniTask<TResult>> action, CancellationToken cancellationToken)
             => ExecuteAsync((_, ct) => action(ct), new Context(), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -165,7 +165,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
             => ExecuteAsync(action, new Context(contextData), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy is in use, also cancels any further retries.</param>
         /// <returns>The value returned by the action</returns>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken)
             => ExecuteAsync(action, context, cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Polly
         /// <returns>The value returned by the action</returns>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<CancellationToken, Task<TResult>> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<CancellationToken, UniTask<TResult>> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAsync((_, ct) => action(ct), new Context(), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace Polly
         /// <returns>The value returned by the action</returns>
         /// <exception cref="ArgumentNullException">contextData</exception>
         [DebuggerStepThrough]
-        public Task<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAsync(action, new Context(contextData), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace Polly
         /// <returns>The value returned by the action</returns>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public async Task<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public async UniTask<TResult> ExecuteAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -225,7 +225,7 @@ namespace Polly
 
             try
             {
-                return await ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext);
+                return await ImplementationAsync(action, context, cancellationToken, continueOnCapturedContext);
             }
             finally
             {
@@ -245,7 +245,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Task> action)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<UniTask> action)
             => ExecuteAndCaptureAsync((_, _) => action(), new Context(), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -256,7 +256,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">contextData</exception>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, Task> action, IDictionary<string, object> contextData)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, UniTask> action, IDictionary<string, object> contextData)
             => ExecuteAndCaptureAsync((ctx, _) => action(ctx), new Context(contextData), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace Polly
         /// <param name="context">Context data that is passed to the exception policy.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, Task> action, Context context)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, UniTask> action, Context context)
             => ExecuteAndCaptureAsync((ctx, _) => action(ctx), context, DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<CancellationToken, UniTask> action, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync((_, ct) => action(ct), new Context(), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">contextData</exception>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, Task> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, UniTask> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync(action, new Context(contextData), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -297,7 +297,7 @@ namespace Polly
         /// <param name="context">Context data that is passed to the exception policy.</param>
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, Task> action, Context context, CancellationToken cancellationToken)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, UniTask> action, Context context, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync(action, context, cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace Polly
         /// <param name="continueOnCapturedContext">Whether to continue on a captured synchronization context.</param>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<CancellationToken, Task> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<CancellationToken, UniTask> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAndCaptureAsync((_, ct) => action(ct), new Context(), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">contextData</exception>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, Task> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, UniTask> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAndCaptureAsync(action, new Context(contextData), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -333,13 +333,13 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public async Task<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, Task> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public async UniTask<PolicyResult> ExecuteAndCaptureAsync(Func<Context, CancellationToken, UniTask> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             try
             {
-                await ExecuteAsync(action, context, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext);
+                await ExecuteAsync(action, context, cancellationToken, continueOnCapturedContext);
                 return PolicyResult.Successful(context);
             }
             catch (Exception exception)
@@ -357,7 +357,7 @@ namespace Polly
         /// <param name="action">The action to perform.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Task<TResult>> action)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<UniTask<TResult>> action)
             => ExecuteAndCaptureAsync((_, _) => action(), new Context(), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -369,7 +369,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">contextData</exception>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, Task<TResult>> action, IDictionary<string, object> contextData)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, UniTask<TResult>> action, IDictionary<string, object> contextData)
             => ExecuteAndCaptureAsync((ctx, _) => action(ctx), new Context(contextData), DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -380,7 +380,7 @@ namespace Polly
         /// <param name="context">Context data that is passed to the exception policy.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, Task<TResult>> action, Context context)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, UniTask<TResult>> action, Context context)
             => ExecuteAndCaptureAsync((ctx, _) => action(ctx), context, DefaultCancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -391,7 +391,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<CancellationToken, Task<TResult>> action, CancellationToken cancellationToken)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<CancellationToken, UniTask<TResult>> action, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync((_, ct) => action(ct), new Context(), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">contextData</exception>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync(action, new Context(contextData), cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -416,7 +416,7 @@ namespace Polly
         /// <param name="cancellationToken">A cancellation token which can be used to cancel the action.  When a retry policy in use, also cancels any further retries.</param>
         /// <returns>The captured result</returns>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken)
             => ExecuteAndCaptureAsync(action, context, cancellationToken, DefaultContinueOnCapturedContext);
 
         /// <summary>
@@ -429,7 +429,7 @@ namespace Polly
         /// <returns>The captured result</returns>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<CancellationToken, Task<TResult>> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<CancellationToken, UniTask<TResult>> action, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAndCaptureAsync((_, ct) => action(ct), new Context(), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -443,7 +443,7 @@ namespace Polly
         /// <returns>The captured result</returns>
         /// <exception cref="ArgumentNullException">contextData</exception>
         [DebuggerStepThrough]
-        public Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, IDictionary<string, object> contextData, CancellationToken cancellationToken, bool continueOnCapturedContext)
             => ExecuteAndCaptureAsync(action, new Context(contextData), cancellationToken, continueOnCapturedContext);
 
         /// <summary>
@@ -457,14 +457,14 @@ namespace Polly
         /// <returns>The captured result</returns>
         /// <exception cref="InvalidOperationException">Please use asynchronous-defined policies when calling asynchronous ExecuteAsync (and similar) methods.</exception>
         [DebuggerStepThrough]
-        public async Task<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        public async UniTask<PolicyResult<TResult>> ExecuteAndCaptureAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             try
             {
                 return PolicyResult<TResult>.Successful(
-                    await ExecuteAsync(action, context, cancellationToken, continueOnCapturedContext).ConfigureAwait(continueOnCapturedContext), context);
+                    await ExecuteAsync(action, context, cancellationToken, continueOnCapturedContext), context);
             }
             catch (Exception exception)
             {

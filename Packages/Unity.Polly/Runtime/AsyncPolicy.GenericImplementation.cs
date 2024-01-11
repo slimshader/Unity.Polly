@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly
 {
@@ -13,9 +13,9 @@ namespace Polly
         /// <param name="context">The policy execution context.</param>
         /// <param name="cancellationToken">A token to signal that execution should be cancelled.</param>
         /// <param name="continueOnCapturedContext">Whether async continuations should continue on a captured context.</param>
-        /// <returns>A <see cref="Task{TResult}"/> representing the result of the execution.</returns>
-        protected abstract Task<TResult> ImplementationAsync(
-            Func<Context, CancellationToken, Task<TResult>> action,
+        /// <returns>A <see cref="UniTask{TResult}"/> representing the result of the execution.</returns>
+        protected abstract UniTask<TResult> ImplementationAsync(
+            Func<Context, CancellationToken, UniTask<TResult>> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext
