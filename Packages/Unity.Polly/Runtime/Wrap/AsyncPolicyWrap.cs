@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Wrap
 {
@@ -33,8 +33,8 @@ namespace Polly.Wrap
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task ImplementationAsync(
-            Func<Context, CancellationToken, Task> action,
+        protected override UniTask ImplementationAsync(
+            Func<Context, CancellationToken, UniTask> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext)
@@ -49,7 +49,7 @@ namespace Polly.Wrap
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => AsyncPolicyWrapEngine.ImplementationAsync<TResult>(
                 action,
@@ -105,7 +105,7 @@ namespace Polly.Wrap
         }
 
         /// <inheritdoc/>
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             if (_outerNonGeneric != null)

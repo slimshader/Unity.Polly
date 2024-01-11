@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Wrap
 {
     internal static class AsyncPolicyWrapEngine
     {
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-           Func<Context, CancellationToken, Task<TResult>> func,
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+           Func<Context, CancellationToken, UniTask<TResult>> func,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -19,14 +19,14 @@ namespace Polly.Wrap
                     ctx, 
                     ct, 
                     continueOnCapturedContext
-                    ).ConfigureAwait(continueOnCapturedContext), 
+                    ), 
                 context, 
                 cancellationToken, 
                 continueOnCapturedContext
-                ).ConfigureAwait(continueOnCapturedContext);
+                );
 
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-           Func<Context, CancellationToken, Task<TResult>> func,
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+           Func<Context, CancellationToken, UniTask<TResult>> func,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -38,14 +38,14 @@ namespace Polly.Wrap
                     ctx,
                     ct,
                     continueOnCapturedContext
-                    ).ConfigureAwait(continueOnCapturedContext),
+                    ),
                 context,
                 cancellationToken,
                 continueOnCapturedContext
-                ).ConfigureAwait(continueOnCapturedContext);
+                );
 
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-            Func<Context, CancellationToken, Task<TResult>> func,
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+            Func<Context, CancellationToken, UniTask<TResult>> func,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -57,14 +57,14 @@ namespace Polly.Wrap
                     ctx,
                     ct,
                     continueOnCapturedContext
-                    ).ConfigureAwait(continueOnCapturedContext),
+                    )   ,
                 context,
                 cancellationToken,
                 continueOnCapturedContext
-                ).ConfigureAwait(continueOnCapturedContext);
+                );
 
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-           Func<Context, CancellationToken, Task<TResult>> func,
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+           Func<Context, CancellationToken, UniTask<TResult>> func,
            Context context,
            CancellationToken cancellationToken,
            bool continueOnCapturedContext,
@@ -76,14 +76,14 @@ namespace Polly.Wrap
                     ctx,
                     ct,
                     continueOnCapturedContext
-                ).ConfigureAwait(continueOnCapturedContext),
+                ),
                 context,
                 cancellationToken,
                 continueOnCapturedContext
-            ).ConfigureAwait(continueOnCapturedContext);
+            );
 
-        internal static async Task ImplementationAsync(
-            Func<Context, CancellationToken, Task> action,
+        internal static async UniTask ImplementationAsync(
+            Func<Context, CancellationToken, UniTask> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -95,11 +95,11 @@ namespace Polly.Wrap
                     ctx,
                     ct,
                     continueOnCapturedContext
-                    ).ConfigureAwait(continueOnCapturedContext),
+                    ),
                 context,
                 cancellationToken,
                 continueOnCapturedContext
-                ).ConfigureAwait(continueOnCapturedContext);
+                );
 
     }
 }
