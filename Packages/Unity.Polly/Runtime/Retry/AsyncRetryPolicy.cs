@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Retry
 {
@@ -11,14 +11,14 @@ namespace Polly.Retry
     /// </summary>
     public class AsyncRetryPolicy : AsyncPolicy, IRetryPolicy
     {
-        private readonly Func<Exception, TimeSpan, int, Context, Task> _onRetryAsync;
+        private readonly Func<Exception, TimeSpan, int, Context, UniTask> _onRetryAsync;
         private readonly int _permittedRetryCount;
         private readonly IEnumerable<TimeSpan> _sleepDurationsEnumerable;
         private readonly Func<int, Exception, Context, TimeSpan> _sleepDurationProvider;
 
         internal AsyncRetryPolicy(
             PolicyBuilder policyBuilder,
-            Func<Exception, TimeSpan, int, Context, Task> onRetryAsync,
+            Func<Exception, TimeSpan, int, Context, UniTask> onRetryAsync,
             int permittedRetryCount = Int32.MaxValue,
             IEnumerable<TimeSpan> sleepDurationsEnumerable = null,
             Func<int, Exception, Context, TimeSpan> sleepDurationProvider = null
@@ -33,7 +33,7 @@ namespace Polly.Retry
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             return AsyncRetryEngine.ImplementationAsync(
@@ -58,14 +58,14 @@ namespace Polly.Retry
     /// </summary>
     public class AsyncRetryPolicy<TResult> : AsyncPolicy<TResult>, IRetryPolicy<TResult>
     {
-        private readonly Func<DelegateResult<TResult>, TimeSpan, int, Context, Task> _onRetryAsync;
+        private readonly Func<DelegateResult<TResult>, TimeSpan, int, Context, UniTask> _onRetryAsync;
         private readonly int _permittedRetryCount;
         private readonly IEnumerable<TimeSpan> _sleepDurationsEnumerable;
         private readonly Func<int, DelegateResult<TResult>, Context, TimeSpan> _sleepDurationProvider;
 
         internal AsyncRetryPolicy(
             PolicyBuilder<TResult> policyBuilder,
-            Func<DelegateResult<TResult>, TimeSpan, int, Context, Task> onRetryAsync,
+            Func<DelegateResult<TResult>, TimeSpan, int, Context, UniTask> onRetryAsync,
             int permittedRetryCount = Int32.MaxValue,
             IEnumerable<TimeSpan> sleepDurationsEnumerable = null,
             Func<int, DelegateResult<TResult>, Context, TimeSpan> sleepDurationProvider = null
@@ -80,7 +80,7 @@ namespace Polly.Retry
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => AsyncRetryEngine.ImplementationAsync(
                 action,

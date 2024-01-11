@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using Polly.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
-using Polly.Utilities;
 
 namespace Polly.Retry
 {
     internal static class AsyncRetryEngine
     {
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-            Func<Context, CancellationToken, Task<TResult>> action,
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+            Func<Context, CancellationToken, UniTask<TResult>> action,
             Context context,
             CancellationToken cancellationToken,
             ExceptionPredicates shouldRetryExceptionPredicates,
             ResultPredicates<TResult> shouldRetryResultPredicates,
-            Func<DelegateResult<TResult>, TimeSpan, int, Context, Task> onRetryAsync,
+            Func<DelegateResult<TResult>, TimeSpan, int, Context, UniTask> onRetryAsync,
             int permittedRetryCount = Int32.MaxValue,
             IEnumerable<TimeSpan> sleepDurationsEnumerable = null,
             Func<int, DelegateResult<TResult>, Context, TimeSpan> sleepDurationProvider = null,
@@ -34,7 +34,7 @@ namespace Polly.Retry
 
                     try
                     {
-                        TResult result = await action(context, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                        TResult result = await action(context, cancellationToken);
 
                         if (!shouldRetryResultPredicates.AnyMatch(result))
                         {
@@ -73,11 +73,11 @@ namespace Polly.Retry
 
                     TimeSpan waitDuration = sleepDurationsEnumerator?.Current ?? (sleepDurationProvider?.Invoke(tryCount, outcome, context) ?? TimeSpan.Zero);
 
-                    await onRetryAsync(outcome, waitDuration, tryCount, context).ConfigureAwait(continueOnCapturedContext);
+                    await onRetryAsync(outcome, waitDuration, tryCount, context);
 
                     if (waitDuration > TimeSpan.Zero)
                     {
-                        await SystemClock.SleepAsync(waitDuration, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                        await SystemClock.SleepAsync(waitDuration, cancellationToken);
                     }
                 }
             }
