@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 
 namespace Polly.Timeout
 {
@@ -12,12 +12,12 @@ namespace Polly.Timeout
     {
         private readonly Func<Context, TimeSpan> _timeoutProvider;
         private readonly TimeoutStrategy _timeoutStrategy;
-        private readonly Func<Context, TimeSpan, Task, Exception, Task> _onTimeoutAsync;
+        private readonly Func<Context, TimeSpan, UniTask, Exception, UniTask> _onTimeoutAsync;
 
         internal AsyncTimeoutPolicy(
             Func<Context, TimeSpan> timeoutProvider,
             TimeoutStrategy timeoutStrategy,
-            Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync
             )
         {
             _timeoutProvider = timeoutProvider ?? throw new ArgumentNullException(nameof(timeoutProvider));
@@ -27,8 +27,8 @@ namespace Polly.Timeout
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(
-            Func<Context, CancellationToken, Task<TResult>> action, 
+        protected override UniTask<TResult> ImplementationAsync<TResult>(
+            Func<Context, CancellationToken, UniTask<TResult>> action, 
             Context context, 
             CancellationToken cancellationToken,
             bool continueOnCapturedContext)
@@ -52,12 +52,12 @@ namespace Polly.Timeout
     {
         private Func<Context, TimeSpan> _timeoutProvider;
         private TimeoutStrategy _timeoutStrategy;
-        private Func<Context, TimeSpan, Task, Exception, Task> _onTimeoutAsync;
+        private Func<Context, TimeSpan, UniTask, Exception, UniTask> _onTimeoutAsync;
 
         internal AsyncTimeoutPolicy(
             Func<Context, TimeSpan> timeoutProvider,
             TimeoutStrategy timeoutStrategy,
-            Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             _timeoutProvider = timeoutProvider ?? throw new ArgumentNullException(nameof(timeoutProvider));
             _timeoutStrategy = timeoutStrategy;
@@ -66,8 +66,8 @@ namespace Polly.Timeout
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(
-            Func<Context, CancellationToken, Task<TResult>> action, 
+        protected override UniTask<TResult> ImplementationAsync(
+            Func<Context, CancellationToken, UniTask<TResult>> action, 
             Context context, 
             CancellationToken cancellationToken,
             bool continueOnCapturedContext)

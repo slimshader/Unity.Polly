@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Polly.Timeout;
 using Polly.Utilities;
 
@@ -16,7 +17,7 @@ namespace Polly
         public static AsyncTimeoutPolicy TimeoutAsync(int seconds)
         {
             TimeoutValidator.ValidateSecondsTimeout(seconds);
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(_ => TimeSpan.FromSeconds(seconds), TimeoutStrategy.Optimistic, doNothingAsync);
         }
@@ -31,7 +32,7 @@ namespace Polly
         public static AsyncTimeoutPolicy TimeoutAsync(int seconds, TimeoutStrategy timeoutStrategy)
         {
             TimeoutValidator.ValidateSecondsTimeout(seconds);
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(_ => TimeSpan.FromSeconds(seconds), timeoutStrategy, doNothingAsync);
         }
@@ -46,7 +47,7 @@ namespace Polly
         /// <exception cref="ArgumentOutOfRangeException">seconds;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
         public static AsyncTimeoutPolicy TimeoutAsync(int seconds, Func<Context
-            , TimeSpan, Task, Task> onTimeoutAsync)
+            , TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateSecondsTimeout(seconds);
             if (onTimeoutAsync == null) throw new ArgumentNullException(nameof(onTimeoutAsync));
@@ -63,7 +64,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">seconds;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             if (seconds <= 0) throw new ArgumentOutOfRangeException(nameof(seconds));
             if (onTimeoutAsync == null) throw new ArgumentNullException(nameof(onTimeoutAsync));
@@ -81,7 +82,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">seconds;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">seconds;Value must be greater than zero.</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateSecondsTimeout(seconds);
 
@@ -98,7 +99,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">seconds;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">seconds;Value must be greater than zero.</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(int seconds, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             if (seconds <= 0) throw new ArgumentOutOfRangeException(nameof(seconds));
 
@@ -114,7 +115,7 @@ namespace Polly
         public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(_ => timeout, TimeoutStrategy.Optimistic, doNothingAsync);
         }
@@ -129,7 +130,7 @@ namespace Polly
         public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, TimeoutStrategy timeoutStrategy)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(_ => timeout, timeoutStrategy, doNothingAsync);
         }
@@ -143,7 +144,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">timeout;Value must be a positive TimeSpan (or Timeout.InfiniteTimeSpan to indicate no timeout)</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
 
@@ -159,7 +160,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">timeout;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
 
@@ -176,7 +177,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">timeout;Value must be a positive TimeSpan (or Timeout.InfiniteTimeSpan to indicate no timeout)</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
 
@@ -193,7 +194,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentOutOfRangeException">timeout;Value must be greater than zero.</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(TimeSpan timeout, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             TimeoutValidator.ValidateTimeSpanTimeout(timeout);
 
@@ -210,7 +211,7 @@ namespace Polly
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
             return TimeoutAsync(_ => timeoutProvider(), TimeoutStrategy.Optimistic, doNothingAsync);
         }
 
@@ -225,7 +226,7 @@ namespace Polly
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
             return TimeoutAsync(_ => timeoutProvider(), timeoutStrategy, doNothingAsync);
         }
 
@@ -238,7 +239,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
@@ -254,7 +255,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
@@ -271,7 +272,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
@@ -288,7 +289,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
 
@@ -303,7 +304,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider)
         {
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(timeoutProvider, TimeoutStrategy.Optimistic, doNothingAsync);
         }
@@ -317,7 +318,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy)
         {
-            Func<Context, TimeSpan, Task, Exception, Task> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> doNothingAsync = (_, _, _, _) => TaskHelper.EmptyTask;
 
             return TimeoutAsync(timeoutProvider, timeoutStrategy, doNothingAsync);
         }
@@ -331,7 +332,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
             => TimeoutAsync(timeoutProvider, TimeoutStrategy.Optimistic, onTimeoutAsync);
 
         /// <summary>
@@ -343,7 +344,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
             => TimeoutAsync(timeoutProvider, TimeoutStrategy.Optimistic, onTimeoutAsync);
 
         /// <summary>
@@ -356,7 +357,7 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         /// <exception cref="ArgumentNullException">timeoutProvider</exception>
         /// <exception cref="ArgumentNullException">onTimeoutAsync</exception>
-        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, Task, Task> onTimeoutAsync)
+        public static AsyncTimeoutPolicy TimeoutAsync(Func<Context, TimeSpan> timeoutProvider, TimeoutStrategy timeoutStrategy, Func<Context, TimeSpan, UniTask, UniTask> onTimeoutAsync)
         {
             if (onTimeoutAsync == null) throw new ArgumentNullException(nameof(onTimeoutAsync));
 
@@ -376,7 +377,7 @@ namespace Polly
         public static AsyncTimeoutPolicy TimeoutAsync(
             Func<Context, TimeSpan> timeoutProvider,
             TimeoutStrategy timeoutStrategy,
-            Func<Context, TimeSpan, Task, Exception, Task> onTimeoutAsync)
+            Func<Context, TimeSpan, UniTask, Exception, UniTask> onTimeoutAsync)
         {
             if (timeoutProvider == null) throw new ArgumentNullException(nameof(timeoutProvider));
             if (onTimeoutAsync == null) throw new ArgumentNullException(nameof(onTimeoutAsync));
