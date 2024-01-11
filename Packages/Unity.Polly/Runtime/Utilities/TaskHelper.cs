@@ -1,20 +1,20 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 
 namespace Polly.Utilities
 {
     /// <summary>
-    /// Task helpers.
+    /// UniTask helpers.
     /// </summary>
     public static class TaskHelper
     {
         /// <summary>
-        /// Defines a completed Task for use as a completed, empty asynchronous delegate.
+        /// Defines a completed UniTask for use as a completed, empty asynchronous delegate.
         /// </summary>
-        public static Task EmptyTask =
+        public static UniTask EmptyTask =
 #if NETSTANDARD1_1
-            Task.FromResult(true)
+            UniTask.FromResult(true)
 #else
-            Task.CompletedTask
+            UniTask.CompletedTask
 #endif
             ;
     }

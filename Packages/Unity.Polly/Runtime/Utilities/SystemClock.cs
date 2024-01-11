@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Utilities
 {
@@ -20,9 +20,10 @@ namespace Polly.Utilities
 
         /// <summary>
         /// Allows the setting of a custom async Sleep implementation for testing.
-        /// By default this will be a call to <see cref="M:Task.Delay"/> taking a <see cref="CancellationToken"/>
+        /// By default this will be a call to <see cref="M:UniTask.Delay"/> taking a <see cref="CancellationToken"/>
         /// </summary>
-        public static Func<TimeSpan, CancellationToken, Task> SleepAsync = Task.Delay;
+        public static Func<TimeSpan, CancellationToken, UniTask> SleepAsync = (timeSpan, cancellationToken)
+            => UniTask.Delay((int) timeSpan.TotalMilliseconds, cancellationToken: cancellationToken);
 
         /// <summary>
         /// Allows the setting of a custom DateTime.UtcNow implementation for testing.
@@ -46,21 +47,21 @@ namespace Polly.Utilities
         /// Resets the custom implementations to their defaults. 
         /// Should be called during test teardowns.
         /// </summary>
-        public static void Reset()
-        {
-            Sleep = (timeSpan, cancellationToken) =>
-            {
-                if (cancellationToken.WaitHandle.WaitOne(timeSpan)) cancellationToken.ThrowIfCancellationRequested();
-            };
+        //public static void Reset()
+        //{
+        //    Sleep = (timeSpan, cancellationToken) =>
+        //    {
+        //        if (cancellationToken.WaitHandle.WaitOne(timeSpan)) cancellationToken.ThrowIfCancellationRequested();
+        //    };
 
-            SleepAsync = Task.Delay;
+        //    //SleepAsync = UniTask.Delay;
 
-            UtcNow = () => DateTime.UtcNow;
+        //    UtcNow = () => DateTime.UtcNow;
 
-            DateTimeOffsetUtcNow = () => DateTimeOffset.UtcNow;
+        //    DateTimeOffsetUtcNow = () => DateTimeOffset.UtcNow;
 
-            CancelTokenAfter = (tokenSource, timespan) => tokenSource.CancelAfter(timespan);
+        //    CancelTokenAfter = (tokenSource, timespan) => tokenSource.CancelAfter(timespan);
 
-        }
+        //}
     }
 }
