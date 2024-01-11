@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.Bulkhead
 {
@@ -13,12 +13,12 @@ namespace Polly.Bulkhead
         private readonly SemaphoreSlim _maxParallelizationSemaphore;
         private readonly SemaphoreSlim _maxQueuedActionsSemaphore;
         private readonly int _maxQueueingActions;
-        private Func<Context, Task> _onBulkheadRejectedAsync;
+        private Func<Context, UniTask> _onBulkheadRejectedAsync;
 
         internal AsyncBulkheadPolicy(
             int maxParallelization,
             int maxQueueingActions,
-            Func<Context, Task> onBulkheadRejectedAsync)
+            Func<Context, UniTask> onBulkheadRejectedAsync)
         {
             _maxQueueingActions = maxQueueingActions;
             _onBulkheadRejectedAsync = onBulkheadRejectedAsync ?? throw new ArgumentNullException(nameof(onBulkheadRejectedAsync));
@@ -38,7 +38,7 @@ namespace Polly.Bulkhead
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             return AsyncBulkheadEngine.ImplementationAsync(action, context, _onBulkheadRejectedAsync, _maxParallelizationSemaphore, _maxQueuedActionsSemaphore, cancellationToken, continueOnCapturedContext);
@@ -61,12 +61,12 @@ namespace Polly.Bulkhead
         private readonly SemaphoreSlim _maxParallelizationSemaphore;
         private readonly SemaphoreSlim _maxQueuedActionsSemaphore;
         private readonly int _maxQueueingActions;
-        private Func<Context, Task> _onBulkheadRejectedAsync;
+        private Func<Context, UniTask> _onBulkheadRejectedAsync;
 
         internal AsyncBulkheadPolicy(
             int maxParallelization,
             int maxQueueingActions,
-            Func<Context, Task> onBulkheadRejectedAsync)
+            Func<Context, UniTask> onBulkheadRejectedAsync)
         {
             _maxQueueingActions = maxQueueingActions;
             _onBulkheadRejectedAsync = onBulkheadRejectedAsync ?? throw new ArgumentNullException(nameof(onBulkheadRejectedAsync));
@@ -76,7 +76,7 @@ namespace Polly.Bulkhead
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken, bool continueOnCapturedContext)
         {
             return AsyncBulkheadEngine.ImplementationAsync(action, context, _onBulkheadRejectedAsync, _maxParallelizationSemaphore, _maxQueuedActionsSemaphore, cancellationToken, continueOnCapturedContext);
         }
