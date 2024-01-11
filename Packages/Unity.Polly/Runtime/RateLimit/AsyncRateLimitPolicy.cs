@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.RateLimit
 {
@@ -19,7 +19,7 @@ namespace Polly.RateLimit
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken,Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken,UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => AsyncRateLimitEngine.ImplementationAsync(_rateLimiter, null, action, context, cancellationToken, continueOnCapturedContext);
     }
@@ -42,7 +42,7 @@ namespace Polly.RateLimit
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => AsyncRateLimitEngine.ImplementationAsync(_rateLimiter, _retryAfterFactory, action, context, cancellationToken, continueOnCapturedContext);
     }

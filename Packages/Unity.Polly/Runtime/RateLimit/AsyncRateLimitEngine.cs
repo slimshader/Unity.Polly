@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Polly.RateLimit
 {
     internal static class AsyncRateLimitEngine
     {
-        internal static async Task<TResult> ImplementationAsync<TResult>(
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
             IRateLimiter rateLimiter,
             Func<TimeSpan, Context, TResult> retryAfterFactory,
-            Func<Context, CancellationToken, Task<TResult>> action,
+            Func<Context, CancellationToken, UniTask<TResult>> action,
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext
@@ -19,7 +19,7 @@ namespace Polly.RateLimit
 
             if (permit)
             {
-                return await action(context, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                return await action(context, cancellationToken);
             }
 
             if (retryAfterFactory != null)
