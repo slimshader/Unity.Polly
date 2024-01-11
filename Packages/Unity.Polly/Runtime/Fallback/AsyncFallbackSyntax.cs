@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Polly.Fallback;
 using Polly.Utilities;
+using System;
+using System.Threading;
 
 namespace Polly
 {
@@ -18,11 +18,11 @@ namespace Polly
         /// <param name="fallbackAction">The fallback delegate.</param>
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<CancellationToken, Task> fallbackAction)
+        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<CancellationToken, UniTask> fallbackAction)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
 
-            Func<Exception, Task> doNothing = _ => TaskHelper.EmptyTask;
+            Func<Exception, UniTask> doNothing = _ => TaskHelper.EmptyTask;
             return policyBuilder.FallbackAsync(
                 fallbackAction,
                 doNothing
@@ -38,7 +38,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<CancellationToken, Task> fallbackAction, Func<Exception, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<CancellationToken, UniTask> fallbackAction, Func<Exception, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
@@ -58,7 +58,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<Context, CancellationToken, Task> fallbackAction, Func<Exception, Context, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<Context, CancellationToken, UniTask> fallbackAction, Func<Exception, Context, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
@@ -75,7 +75,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<Exception, Context, CancellationToken, Task> fallbackAction, Func<Exception, Context, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy FallbackAsync(this PolicyBuilder policyBuilder, Func<Exception, Context, CancellationToken, UniTask> fallbackAction, Func<Exception, Context, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
@@ -97,9 +97,9 @@ namespace Polly
         /// <returns>The policy instance.</returns>
         public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, TResult fallbackValue)
         {
-            Func<DelegateResult<TResult>, Task> doNothing = _ => TaskHelper.EmptyTask;
+            Func<DelegateResult<TResult>, UniTask> doNothing = _ => TaskHelper.EmptyTask;
             return policyBuilder.FallbackAsync(
-                _ => Task.FromResult(fallbackValue),
+                _ => UniTask.FromResult(fallbackValue),
                 doNothing
                 );
         }
@@ -111,11 +111,11 @@ namespace Polly
         /// <param name="fallbackAction">The fallback delegate.</param>
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<CancellationToken, Task<TResult>> fallbackAction)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<CancellationToken, UniTask<TResult>> fallbackAction)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
 
-            Func<DelegateResult<TResult>, Task> doNothing = _ => TaskHelper.EmptyTask;
+            Func<DelegateResult<TResult>, UniTask> doNothing = _ => TaskHelper.EmptyTask;
             return policyBuilder.FallbackAsync(
                 fallbackAction,
                 doNothing
@@ -130,12 +130,12 @@ namespace Polly
         /// <param name="onFallbackAsync">The action to call asynchronously before invoking the fallback delegate.</param>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, TResult fallbackValue, Func<DelegateResult<TResult>, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, TResult fallbackValue, Func<DelegateResult<TResult>, UniTask> onFallbackAsync)
         {
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
 
             return policyBuilder.FallbackAsync(
-                (_, _, _) => Task.FromResult(fallbackValue),
+                (_, _, _) => UniTask.FromResult(fallbackValue),
                 (outcome, _) => onFallbackAsync(outcome)
                 );
         }
@@ -149,7 +149,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<CancellationToken, Task<TResult>> fallbackAction, Func<DelegateResult<TResult>, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<CancellationToken, UniTask<TResult>> fallbackAction, Func<DelegateResult<TResult>, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
@@ -168,12 +168,12 @@ namespace Polly
         /// <param name="onFallbackAsync">The action to call asynchronously before invoking the fallback delegate.</param>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, TResult fallbackValue, Func<DelegateResult<TResult>, Context, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, TResult fallbackValue, Func<DelegateResult<TResult>, Context, UniTask> onFallbackAsync)
         {
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
 
             return policyBuilder.FallbackAsync(
-                (_, _, _) => Task.FromResult(fallbackValue),
+                (_, _, _) => UniTask.FromResult(fallbackValue),
                 onFallbackAsync
                 );
         }
@@ -187,7 +187,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<Context, CancellationToken, Task<TResult>> fallbackAction, Func<DelegateResult<TResult>, Context, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<Context, CancellationToken, UniTask<TResult>> fallbackAction, Func<DelegateResult<TResult>, Context, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
@@ -204,7 +204,7 @@ namespace Polly
         /// <exception cref="ArgumentNullException">fallbackAction</exception>
         /// <exception cref="ArgumentNullException">onFallbackAsync</exception>
         /// <returns>The policy instance.</returns>
-        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<DelegateResult<TResult>, Context, CancellationToken, Task<TResult>> fallbackAction, Func<DelegateResult<TResult>, Context, Task> onFallbackAsync)
+        public static AsyncFallbackPolicy<TResult> FallbackAsync<TResult>(this PolicyBuilder<TResult> policyBuilder, Func<DelegateResult<TResult>, Context, CancellationToken, UniTask<TResult>> fallbackAction, Func<DelegateResult<TResult>, Context, UniTask> onFallbackAsync)
         {
             if (fallbackAction == null) throw new ArgumentNullException(nameof(fallbackAction));
             if (onFallbackAsync == null) throw new ArgumentNullException(nameof(onFallbackAsync));
