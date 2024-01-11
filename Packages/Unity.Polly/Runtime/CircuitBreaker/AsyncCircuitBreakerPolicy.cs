@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using Polly.Utilities;
+using System;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
-using Polly.Utilities;
 
 namespace Polly.CircuitBreaker
 {
@@ -43,18 +43,18 @@ namespace Polly.CircuitBreaker
         public void Reset() => _breakerController.Reset();
 
         /// <inheritdoc/>
-        protected override async Task<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override async UniTask<TResult> ImplementationAsync<TResult>(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
         {
             TResult result = default;
             await AsyncCircuitBreakerEngine.ImplementationAsync<EmptyStruct>(
-                async (ctx, ct) => { result = await action(ctx, ct).ConfigureAwait(continueOnCapturedContext); return EmptyStruct.Instance; },
+                async (ctx, ct) => { result = await action(ctx, ct); return EmptyStruct.Instance; },
                 context,
                 cancellationToken,
                 continueOnCapturedContext,
                 ExceptionPredicates,
                 ResultPredicates<EmptyStruct>.None,
-                _breakerController).ConfigureAwait(continueOnCapturedContext);
+                _breakerController);
             return result;
         }
     }
@@ -104,7 +104,7 @@ namespace Polly.CircuitBreaker
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-        protected override Task<TResult> ImplementationAsync(Func<Context, CancellationToken, Task<TResult>> action, Context context, CancellationToken cancellationToken,
+        protected override UniTask<TResult> ImplementationAsync(Func<Context, CancellationToken, UniTask<TResult>> action, Context context, CancellationToken cancellationToken,
             bool continueOnCapturedContext)
             => AsyncCircuitBreakerEngine.ImplementationAsync(
                 action,

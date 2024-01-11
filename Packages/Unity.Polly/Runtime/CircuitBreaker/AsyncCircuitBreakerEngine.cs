@@ -1,14 +1,14 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Polly.Utilities;
+using System;
+using System.Threading;
 
 namespace Polly.CircuitBreaker
 {
     internal class AsyncCircuitBreakerEngine
     {
-        internal static async Task<TResult> ImplementationAsync<TResult>(
-            Func<Context, CancellationToken, Task<TResult>> action, 
+        internal static async UniTask<TResult> ImplementationAsync<TResult>(
+            Func<Context, CancellationToken, UniTask<TResult>> action, 
             Context context,
             CancellationToken cancellationToken,
             bool continueOnCapturedContext,
@@ -22,7 +22,7 @@ namespace Polly.CircuitBreaker
 
             try
             {
-                TResult result = await action(context, cancellationToken).ConfigureAwait(continueOnCapturedContext);
+                TResult result = await action(context, cancellationToken);
 
                 if (shouldHandleResultPredicates.AnyMatch(result))
                 {
