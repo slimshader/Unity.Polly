@@ -5,9 +5,8 @@ This version is based of [v7.2.4](https://github.com/App-vNext/Polly/tree/7.2.4)
 Example of Retry policy combined with a Fallback (by PolicyWrap):
 
 ```csharp
-p.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Polly;
-using Polly.Fallback;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
